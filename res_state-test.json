@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/state-test.response.schema.json",
+  "title": "State Test Response",
+  "type": "object",
+  "properties": {
+    "status": { "type": "string" },
+    "results": {
+      "type": "object",
+      "properties": {
+        "init": { "type": "string" },
+        "put": { "type": "string" },
+        "get": { "type": "string" },
+        "delete": { "type": "string" },
+        "retrievedValue": {
+          "type": "object",
+          "properties": {
+            "message": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" }
+          },
+          "required": ["message","timestamp"]
+        }
+      }
+    },
+    "error": { "type": "string" },
+    "stack": { "type": "string" }
+  },
+  "required": ["status"]
+}

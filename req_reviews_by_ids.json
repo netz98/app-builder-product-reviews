@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/get-reviews-by-ids.request.schema.json",
+  "title": "Get Reviews By IDs Request",
+  "type": "object",
+  "properties": {
+    "ids": { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Array of review IDs" },
+    "id": { "type": "string", "description": "Single review ID (alternative to ids)" }
+  },
+  "oneOf": [ { "required": ["ids"] }, { "required": ["id"] } ],
+  "additionalProperties": false
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/update-reviews.response.schema.json",
+  "title": "Update Reviews Response",
+  "type": "object",
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "success": { "type": "boolean" },
+          "error": { "type": "string" },
+          "review": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "sku": { "type": "string" },
+              "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+              "title": { "type": "string" },
+              "text": { "type": "string" },
+              "author": { "type": "string" },
+              "author_email": { "type": "string", "format": "email" },
+              "status": { "type": "string" },
+              "created_at": { "type": "string", "format": "date-time" },
+              "updated_at": { "type": "string", "format": "date-time" }
+            },
+            "required": ["id","sku","rating","title","text","author","author_email","status","created_at","updated_at"]
+          }
+        },
+        "required": ["id","success"]
+      }
+    }
+  },
+  "required": ["results"]
+}

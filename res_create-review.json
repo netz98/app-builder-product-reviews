@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/create-review.response.schema.json",
+  "title": "Create Review Response",
+  "description": "Response schema for create-review action, returns the created review object.",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "description": "Unique review identifier" },
+    "sku": { "type": "string", "description": "Product SKU" },
+    "rating": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Rating between 1 and 5" },
+    "title": { "type": "string", "description": "Review title" },
+    "text": { "type": "string", "description": "Review text" },
+    "author": { "type": "string", "description": "Author name" },
+    "author_email": { "type": "string", "format": "email", "description": "Author email" },
+    "status": { "type": "string", "description": "Review status (e.g., pending, approved)" },
+    "created_at": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+    "updated_at": { "type": "string", "format": "date-time", "description": "Last update timestamp" }
+  },
+  "required": [
+    "id", "sku", "rating", "title", "text", "author", "author_email", "status", "created_at", "updated_at"
+  ]
+}

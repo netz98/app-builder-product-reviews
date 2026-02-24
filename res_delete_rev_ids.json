@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/delete-reviews-by-ids.response.schema.json",
+  "title": "Delete Reviews By IDs Response",
+  "type": "object",
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "success": { "type": "boolean" },
+          "error": { "type": "string" }
+        },
+        "required": ["id","success"]
+      }
+    }
+  },
+  "required": ["results"]
+}

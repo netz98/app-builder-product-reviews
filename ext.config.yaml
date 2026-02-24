@@ -1,0 +1,109 @@
+operations:
+  view:
+    - type: web
+      impl: index.html
+actions: actions
+web: web-src
+runtimeManifest:
+  packages:
+    admin-ui-sdk:
+      license: Apache-2.0
+      actions:
+        registration:
+          function: actions/registration/index.js
+          web: 'yes'
+          runtime: 'nodejs:18'
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            require-adobe-auth: false
+            final: true
+    review:
+      annotations:
+        use-storage-class: CosmosDB
+      actions:
+        create-review:
+          function: actions/create-review/index.js
+          web: 'yes'
+          runtime: 'nodejs:18'
+          inputs:
+            AIO_DB_REGION: $AIO_DB_REGION
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            require-adobe-auth: true
+        get-list-reviews:
+          function: actions/get-list-reviews/index.js
+          web: 'yes'
+          runtime: 'nodejs:18'
+          inputs:
+            AIO_DB_REGION: $AIO_DB_REGION
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            require-adobe-auth: true
+        state-test:
+          function: actions/state-test/index.js
+          web: 'yes'
+          runtime: 'nodejs:18'
+          inputs:
+            AIO_DB_REGION: $AIO_DB_REGION
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            require-adobe-auth: true
+        get-reviews-by-ids:
+          function: actions/get-reviews-by-ids/index.js
+          web: 'yes'
+          runtime: 'nodejs:18'
+          inputs:
+            AIO_DB_REGION: $AIO_DB_REGION
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            require-adobe-auth: true
+        update-reviews:
+          function: actions/update-reviews/index.js
+          web: 'yes'
+          runtime: 'nodejs:18'
+          inputs:
+            AIO_DB_REGION: $AIO_DB_REGION
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            require-adobe-auth: true
+        delete-reviews-by-ids:
+          function: actions/delete-reviews-by-ids/index.js
+          web: 'yes'
+          runtime: 'nodejs:18'
+          inputs:
+            AIO_DB_REGION: $AIO_DB_REGION
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            require-adobe-auth: true
+      apis:
+        create-review: # API name
+          v1:
+            review:
+              create-review: # Runtime action
+                method: POST
+                response: json
+        get-list-reviews: # API name
+          v1:
+            review/get-list:
+              get-list-reviews: # Runtime action
+                method: POST
+                response: json
+        get-reviews-by-ids: # API name
+          v1:
+            review/get-by-ids:
+              get-reviews-by-ids: # Runtime action
+                method: POST
+                response: json
+        update-reviews: # API name
+          v1:
+            review:
+              update-reviews: # Runtime action
+                method: PUT
+                response: json
+        delete-reviews-by-ids: # API name
+          v1:
+            review/delete-reviews-by-ids:
+              delete-reviews-by-ids: # Runtime action
+                method: POST
+                response: json

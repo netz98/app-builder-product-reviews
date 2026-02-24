@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/create-review.schema.json",
+  "title": "Create Review",
+  "description": "Create a Product Review",
+  "type": "object",
+  "properties": {
+    "sku": {
+      "type": "string",
+      "description": "Product SKU"
+    },
+    "rating": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Rating between 1 and 5"
+    },
+    "title": {
+      "type": "string",
+      "description": "Review title"
+    },
+    "text": {
+      "type": "string",
+      "description": "Review text"
+    },
+    "author": {
+      "type": "string",
+      "description": "Author name"
+    },
+    "author_email": {
+      "type": "string",
+      "format": "email",
+      "description": "Author email"
+    },
+    "status": {
+      "type": "string",
+      "description": "Review status (optional, defaults to 'pending')"
+    }
+  },
+  "required": [
+    "sku",
+    "rating",
+    "title",
+    "text",
+    "author",
+    "author_email"
+  ]
+}

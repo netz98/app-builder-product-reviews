@@ -1,0 +1,8 @@
+{
+  "name": "review",
+  "displayName": "Product Reviews",
+  "description": "Manage product reviews in Adobe Commerce Admin",
+  "platform": "web",
+  "id": "review",
+  "version": "1.0.0"
+}

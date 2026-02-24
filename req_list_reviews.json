@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/get-list-reviews.request.schema.json",
+  "title": "Get List Reviews Request",
+  "type": "object",
+  "description": "Optional filters; if none supplied, returns all reviews.",
+  "properties": {
+    "sku": { "type": "string" },
+    "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "title": { "type": "string" },
+    "text": { "type": "string" },
+    "author": { "type": "string" },
+    "author_email": { "type": "string", "format": "email" },
+    "status": { "type": "string" },
+    "page": { "type": "integer", "minimum": 1, "description": "Page number (1-based)." },
+    "pageSize": { "type": "integer", "minimum": 1, "description": "Items per page." },
+    "sortBy": { "type": "string", "enum": ["created_at", "updated_at", "rating", "status"], "description": "Sort field." },
+    "sortDir": { "type": "string", "enum": ["asc", "desc"], "description": "Sort direction." }
+  },
+  "additionalProperties": false
+}

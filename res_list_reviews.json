@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/get-list-reviews.response.schema.json",
+  "title": "Get List Reviews Response",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "sku": { "type": "string" },
+          "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "author": { "type": "string" },
+          "author_email": { "type": "string", "format": "email" },
+          "status": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id","sku","rating","title","text","author","author_email","status","created_at","updated_at"]
+      }
+    },
+    "total": { "type": "integer", "minimum": 0 },
+    "page": { "type": "integer", "minimum": 1 },
+    "pageSize": { "type": "integer", "minimum": 1 },
+    "sortBy": { "type": "string" },
+    "sortDir": { "type": "string" }
+  },
+  "required": ["items", "total", "page", "pageSize", "sortBy", "sortDir"]
+}

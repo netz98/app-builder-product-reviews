@@ -1,0 +1,69 @@
+{
+  "meshConfig": {
+    "sources": [
+      {
+        "name": "ReviewsService",
+        "handler": {
+          "JsonSchema": {
+            "baseUrl": "https://714154-545silverhare.adobeioruntime.net/api/v1/web/review",
+            "operationHeaders": {
+              "Authorization": "{context.headers['authorization']}",
+              "x-gw-ims-org-id": "{context.headers['x-gw-ims-org-id']}",
+              "Content-Type": "application/json"
+            },
+            "operations": [
+              {
+                "type": "Mutation",
+                "field": "create_review",
+                "path": "/create-review",
+                "method": "POST",
+                "requestSchema": "./req_create-review.json",
+                "responseSchema": "./res_create-review.json"
+              },
+              {
+                "type": "Query",
+                "field": "get_list_reviews",
+                "path": "/get-list-reviews",
+                "method": "POST",
+                "requestSchema": "./req_list_reviews.json",
+                "responseSchema": "./res_list_reviews.json"
+              },
+              {
+                "type": "Query",
+                "field": "get_reviews_by_ids",
+                "path": "/get-reviews-by-ids",
+                "method": "POST",
+                "requestSchema": "./req_reviews_by_ids.json",
+                "responseSchema": "./res_reviews_by_ids.json"
+              },
+              {
+                "type": "Mutation",
+                "field": "update_reviews",
+                "path": "/update-reviews",
+                "method": "PUT",
+                "requestSchema": "./req_update-reviews.json",
+                "responseSchema": "./res_update-reviews.json"
+              },
+              {
+                "type": "Mutation",
+                "field": "delete_reviews_by_ids",
+                "path": "/delete-reviews-by-ids",
+                "method": "POST",
+                "requestSchema": "./req_delete_rev_ids.json",
+                "responseSchema": "./res_delete_rev_ids.json"
+              },
+              {
+                "type": "Query",
+                "field": "state_test",
+                "path": "/state-test",
+                "method": "POST",
+                "requestSchema": "./req_state-test.json",
+                "responseSchema": "./res_state-test.json"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

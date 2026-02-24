@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/get-reviews-by-ids.response.schema.json",
+  "title": "Get Reviews By IDs Response",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "string" },
+      "sku": { "type": "string" },
+      "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+      "title": { "type": "string" },
+      "text": { "type": "string" },
+      "author": { "type": "string" },
+      "author_email": { "type": "string", "format": "email" },
+      "status": { "type": "string" },
+      "created_at": { "type": "string", "format": "date-time" },
+      "updated_at": { "type": "string", "format": "date-time" }
+    },
+    "required": ["id","sku","rating","title","text","author","author_email","status","created_at","updated_at"]
+  }
+}

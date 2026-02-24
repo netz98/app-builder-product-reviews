@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/state-test.request.schema.json",
+  "title": "State Test Request",
+  "type": "object",
+  "description": "No parameters required.",
+  "properties": {},
+  "additionalProperties": false
+}
