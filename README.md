@@ -11,7 +11,7 @@ Adobe App Builder app for managing product reviews in Adobe Commerce Admin. Prov
 ## Tech Stack
 - Adobe App Builder (Runtime actions + static UI)
 - React + React Spectrum UI
-- `@adobe/aio-lib-db` via `StateRepository`
+- `@adobe/aio-lib-db` via `StorageRepository`
 - Admin UI SDK (`@adobe/uix-guest`)
 
 ## Project Structure
