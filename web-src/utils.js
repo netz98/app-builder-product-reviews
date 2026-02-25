@@ -5,6 +5,18 @@
 /* global fetch */
 import actions from './src/config.json'
 
+export const isShellContext = () => {
+    if (typeof window === 'undefined') {
+        return false
+    }
+    const hostname = window.location?.hostname || ''
+    const ancestorOrigins = window.location?.ancestorOrigins || []
+    const referrer = document.referrer || ''
+    const isShell = Array.from(ancestorOrigins).some((origin) => origin.includes('experience.adobe.com')) ||
+        referrer.includes('experience.adobe.com')
+    return hostname === 'localhost' || isShell
+}
+
 async function invokeAction (actionName, _headers, _params, props) {
     const action = getAction(actionName, actions)
     const headers = _headers || {}
@@ -72,14 +84,10 @@ async function actionWebInvoke (actionUrl, headers = {}, params = {}, method = '
     return content
 }
 
-function getAction(name, actions) {
-    return new Array(name, actions[name])
-}
-
 export default actionWebInvoke
 
 module.exports = {
     actionWebInvoke,
-    getAction,
-    invokeAction
+    invokeAction,
+    isShellContext
 }

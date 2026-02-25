@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { actionWebInvoke } from '../../utils';
+import { actionWebInvoke, isShellContext } from '../../utils';
 import { isRequiredFieldValid, isRatingValid, isEmailValid } from '../../reviewValidator.js';
 import {
   isAuthenticationError,
   handleAuthFailure,
   getAuthHeaders,
-  hasAuthContext,
-  ensureWindowImsCredentials,
-  getShellAuth,
-  getWindowAuth
+  hasAuthContext
 } from '../../utils/auth';
 import action from '../config.json';
 import '../ac-backend-theme.css';
@@ -46,6 +43,7 @@ function ReviewManager(props) {
     hasIms: Boolean(props?.ims),
     imsKeys: props?.ims ? Object.keys(props.ims) : []
   })
+  const isShellContextActive = isShellContext()
   const EMPTY_FORM = {
     sku: '',
     rating: null,
@@ -94,31 +92,6 @@ function ReviewManager(props) {
     }), [props.ims, connection]);
     const isAuthAvailable = hasAuthContext(authContext);
 
-    // useEffect(() => {
-    //
-    //     const fetchCredentials = async () => {
-    //         if (props?.ims?.token || props?.ims?.imsToken) {
-    //             console.log('[ReviewManager] IMS token already provided via props, skipping guest connection')
-    //             return
-    //         }
-    //         try {
-    //             const guestConnection = await attach({ id: extensionId })
-    //             const context = guestConnection?.sharedContext
-    //             const token = context?.get?.('imsToken')
-    //             const orgId = context?.get?.('imsOrgId')
-    //             if (token) {
-    //                 props.ims.token = token
-    //                 if (orgId) props.ims.org = orgId
-    //             } else {
-    //                 console.log('[ReviewManager] Waiting for Adobe Commerce to push the IMS token...')
-    //             }
-    //         } catch (error) {
-    //             console.warn('[ReviewManager] Failed to attach UIX guest connection', error)
-    //         }
-    //     }
-    //     fetchCredentials()
-    // }, [props])
-
     useEffect(() => {
         const fetchCredentials = async () => {
             if (!props?.ims?.token) {
@@ -136,7 +109,7 @@ function ReviewManager(props) {
         })
     }, []);
 
-// 2. TRIGGER FETCH (The missing piece)
+// 2. TRIGGER FETCH
     useEffect(() => {
         if (hasAuthContext({ ims: props.ims, connection }) && isLoading) {
             console.log('[ReviewManager] Token verified, starting fetch...');
@@ -147,55 +120,50 @@ function ReviewManager(props) {
         }
     }, [connection, props.ims, isLoading]); // Re-run when connection or ims changes
 
-  // useEffect(() => {
-  //   ensureWindowImsCredentials({ connection, extensionId, setConnection })
-  // }, [connection])
-
-  useEffect(() => {
-    if (!connection?.sharedContext?.on) {
-      return
-    }
-    const logSharedContextSnapshot = () => {
-      if (!connection?.sharedContext?.get || !connection?.sharedContext?.keys) {
+    useEffect(() => {
+      if (!connection?.sharedContext?.on) {
         return
       }
-      const keys = Array.from(connection.sharedContext.keys())
-      const hasIms = Boolean(connection.sharedContext.get('ims'))
-      const hasImsToken = Boolean(connection.sharedContext.get('imsToken'))
-      const hasImsAccessToken = Boolean(connection.sharedContext.get('imsAccessToken'))
-      const hasAccessToken = Boolean(connection.sharedContext.get('accessToken'))
-      const hasToken = Boolean(connection.sharedContext.get('token'))
-      const hasAuthorization = Boolean(connection.sharedContext.get('authorization'))
-      const hasImsOrgId = Boolean(connection.sharedContext.get('imsOrgId'))
-      const hasImsOrg = Boolean(connection.sharedContext.get('imsOrg'))
-      const hasOrgId = Boolean(connection.sharedContext.get('orgId'))
-      const hasOrg = Boolean(connection.sharedContext.get('org'))
-      console.info('[auth] sharedContext keys', keys)
-      console.info('[auth] sharedContext token flags', {
-        hasIms,
-        hasImsToken,
-        hasImsAccessToken,
-        hasAccessToken,
-        hasToken,
-        hasAuthorization,
-        hasImsOrgId,
-        hasImsOrg,
-        hasOrgId,
-        hasOrg
-      })
-    }
-    logSharedContextSnapshot()
-    const handleSharedContextChange = () => {
-      ensureWindowImsCredentials({ connection, extensionId, setConnection })
-      logSharedContextSnapshot()
-    }
-    connection.sharedContext.on('change', handleSharedContextChange)
-    return () => {
-      if (connection?.sharedContext?.off) {
-        connection.sharedContext.off('change', handleSharedContextChange)
+      const logSharedContextSnapshot = () => {
+        if (!connection?.sharedContext?.get || !connection?.sharedContext?.keys) {
+          return
+        }
+        const keys = Array.from(connection.sharedContext.keys())
+        const hasIms = Boolean(connection.sharedContext.get('ims'))
+        const hasImsToken = Boolean(connection.sharedContext.get('imsToken'))
+        const hasImsAccessToken = Boolean(connection.sharedContext.get('imsAccessToken'))
+        const hasAccessToken = Boolean(connection.sharedContext.get('accessToken'))
+        const hasToken = Boolean(connection.sharedContext.get('token'))
+        const hasAuthorization = Boolean(connection.sharedContext.get('authorization'))
+        const hasImsOrgId = Boolean(connection.sharedContext.get('imsOrgId'))
+        const hasImsOrg = Boolean(connection.sharedContext.get('imsOrg'))
+        const hasOrgId = Boolean(connection.sharedContext.get('orgId'))
+        const hasOrg = Boolean(connection.sharedContext.get('org'))
+        console.info('[auth] sharedContext keys', keys)
+        console.info('[auth] sharedContext token flags', {
+          hasIms,
+          hasImsToken,
+          hasImsAccessToken,
+          hasAccessToken,
+          hasToken,
+          hasAuthorization,
+          hasImsOrgId,
+          hasImsOrg,
+          hasOrgId,
+          hasOrg
+        })
       }
-    }
-  }, [connection])
+      logSharedContextSnapshot()
+      const handleSharedContextChange = () => {
+        logSharedContextSnapshot()
+      }
+      connection.sharedContext.on('change', handleSharedContextChange)
+      return () => {
+        if (connection?.sharedContext?.off) {
+          connection.sharedContext.off('change', handleSharedContextChange)
+        }
+      }
+    }, [connection])
 
   useEffect(() => {
     if (!isAuthAvailable || hasLoadedRef.current) {
@@ -586,9 +554,8 @@ function ReviewManager(props) {
     return Array.from(statusSet);
   }, [reviews]);
 
-  const hasShellIms = Boolean(getShellAuth(props.ims).token)
-  const hasWindowIms = Boolean(getWindowAuth().token)
-  if (!connection && !hasShellIms && !hasWindowIms) {
+  const hasHeaders = Boolean(getAuthHeaders(authContext).authorization)
+  if (!connection && !hasHeaders) {
     return (
       <Flex alignItems="center" justifyContent="center" height="100vh">
         <ProgressCircle aria-label="Connecting to Adobe Commerce..." isIndeterminate />
@@ -642,7 +609,9 @@ function ReviewManager(props) {
               <ProgressCircle aria-label="Loading…" isIndeterminate size="L" />
             </div>
         )}
-        <h2 className="ac-title" style={{ marginBottom: 24 }}>Product Reviews</h2>
+        {isShellContextActive && (
+          <h2 className="ac-title" style={{ marginBottom: 24 }}>Product Reviews</h2>
+        )}
 
         {/* Submit Review button area (gray background with inset orange button) */}
         <Flex
