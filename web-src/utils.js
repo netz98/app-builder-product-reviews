@@ -53,7 +53,7 @@ async function actionWebInvoke (actionUrl, headers = {}, params = {}, method = '
     if (fetchConfig.method === 'GET') {
         actionUrl = new URL(actionUrl)
         Object.keys(params).forEach(key => actionUrl.searchParams.append(key, params[key]))
-    } else if (fetchConfig.method === 'POST') {
+    } else if (fetchConfig.method === 'POST' || fetchConfig.method === 'PUT') {
         fetchConfig.body = JSON.stringify(params)
     }
 

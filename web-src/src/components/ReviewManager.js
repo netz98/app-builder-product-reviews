@@ -329,7 +329,7 @@ function ReviewManager(props) {
     }
     try {
       // Use delete-reviews-by-id for hard delete
-      await actionWebInvoke('review/delete-reviews-by-ids', getAuthHeaders(authContext), { ids: [id] }, 'post');
+      await actionWebInvoke(action['review/delete-reviews-by-ids'], getAuthHeaders(authContext), { ids: [id] }, 'post');
       notify('success', 'Review deleted.');
       refreshReviews(); // Refresh the list
     } catch (e) {
@@ -355,7 +355,7 @@ function ReviewManager(props) {
     }
     setIsSubmitting(true);
     try {
-      await actionWebInvoke('review/create-review', getAuthHeaders(authContext), {
+      await actionWebInvoke(action['review/create-review'], getAuthHeaders(authContext), {
         sku: createForm.sku,
         rating: Number(createForm.rating),
         title: createForm.title,
@@ -387,7 +387,7 @@ function ReviewManager(props) {
       return;
     }
     try {
-      await actionWebInvoke('review/update-reviews', getAuthHeaders(authContext), { reviews: [{ id, status }] }, 'put');
+      await actionWebInvoke(action['review/update-reviews'], getAuthHeaders(authContext), { reviews: [{ id, status }] }, 'put');
       notify('success', `Review ${status}.`);
       refreshReviews();
     } catch (e) {
@@ -514,7 +514,7 @@ function ReviewManager(props) {
     }
     setIsEditSubmitting(true);
     try {
-      await actionWebInvoke('review/update-reviews', getAuthHeaders(authContext), {
+      await actionWebInvoke(action['review/update-reviews'], getAuthHeaders(authContext), {
         reviews: [{
           id: editingReview.id,
           title: editForm.title,
