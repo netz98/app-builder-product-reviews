@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Provider, defaultTheme } from '@adobe/react-spectrum'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Route, Routes, HashRouter } from 'react-router-dom'
 import ExtensionRegistration from './ExtensionRegistration'
-import ReviewManager from './ReviewManager'
+import { logger } from '../../utils/log';
 
 function App (props) {
-    console.warn('[App] render', {
+    logger.debug('[App] render', {
         hasIms: Boolean(props?.ims),
         imsKeys: props?.ims ? Object.keys(props.ims) : [],
         hasRuntime: Boolean(props?.runtime)

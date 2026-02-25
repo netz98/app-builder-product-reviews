@@ -5,16 +5,14 @@
 /* global fetch */
 import actions from './src/config.json'
 
-export const isShellContext = () => {
+export const isCommerceAdminContext = () => {
     if (typeof window === 'undefined') {
         return false
     }
-    const hostname = window.location?.hostname || ''
     const ancestorOrigins = window.location?.ancestorOrigins || []
     const referrer = document.referrer || ''
-    const isShell = Array.from(ancestorOrigins).some((origin) => origin.includes('experience.adobe.com')) ||
-        referrer.includes('experience.adobe.com')
-    return hostname === 'localhost' || isShell
+    return Array.from(ancestorOrigins).some((origin) => origin.includes('admin.commerce.adobe.com')) ||
+        referrer.includes('admin.commerce.adobe.com')
 }
 
 async function invokeAction (actionName, _headers, _params, props) {
@@ -89,5 +87,5 @@ export default actionWebInvoke
 module.exports = {
     actionWebInvoke,
     invokeAction,
-    isShellContext
+    isCommerceAdminContext
 }

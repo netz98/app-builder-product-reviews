@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { actionWebInvoke, isShellContext } from '../../utils';
+import { actionWebInvoke, isCommerceAdminContext } from '../../utils';
 import { isRequiredFieldValid, isRatingValid, isEmailValid } from '../../reviewValidator.js';
 import {
   isAuthenticationError,
   handleAuthFailure,
-  getAuthHeaders,
-  hasAuthContext
+  getAuthHeaders
 } from '../../utils/auth';
+import { logger } from '../../utils/log';
 import action from '../config.json';
 import '../ac-backend-theme.css';
 import { extensionId } from './ExtensionRegistration';
-import { attach } from '@adobe/uix-guest'
+import { useAuthContext } from '../hooks/useAuthContext'
 
 import {
   ProgressCircle,
@@ -39,11 +39,11 @@ import ReviewFormModal from './ReviewFormModal';
 const AUTH_REQUIRED_MESSAGE = 'Auth required. Open this app from Commerce Admin or Experience Cloud Shell.';
 
 function ReviewManager(props) {
-  console.warn('[ReviewManager] render', {
+  logger.debug('[ReviewManager] render', {
     hasIms: Boolean(props?.ims),
     imsKeys: props?.ims ? Object.keys(props.ims) : []
   })
-  const isShellContextActive = isShellContext()
+  const isCommerceAdmin = isCommerceAdminContext()
   const EMPTY_FORM = {
     sku: '',
     rating: null,
@@ -83,104 +83,30 @@ function ReviewManager(props) {
   const [pageSize, setPageSize] = useState(10); // Default page size
   const pageSizeOptions = [10, 25, 50, 100];
 
-  // Get the connection to the Commerce Admin host
-  const [connection, setConnection] = useState(null);
   const hasLoadedRef = useRef(false);
-    const authContext = useMemo(() => ({
-        ims: props.ims,
-        connection
-    }), [props.ims, connection]);
-    const isAuthAvailable = hasAuthContext(authContext);
-
-    useEffect(() => {
-        const fetchCredentials = async () => {
-            if (!props?.ims?.token) {
-                const guestConnection = await attach({ id: extensionId });
-                props.ims.token = guestConnection?.sharedContext?.get('imsToken');
-                props.ims.org = guestConnection?.sharedContext?.get('imsOrgId');
-                setConnection(guestConnection || null)
-            }
-            setIsLoading(false);
-        };
-
-        fetchCredentials().catch((error) => {
-            console.warn('[auth] Failed to attach guest connection', error)
-            setIsLoading(false)
-        })
-    }, []);
-
-// 2. TRIGGER FETCH
-    useEffect(() => {
-        if (hasAuthContext({ ims: props.ims, connection }) && isLoading) {
-            console.log('[ReviewManager] Token verified, starting fetch...');
-            fetchReviews(1);
-        } else if (isLoading) {
-            // This log will help you see the "waiting" period in the console
-            console.log('[ReviewManager] Connection established but waiting for IMS token...');
-        }
-    }, [connection, props.ims, isLoading]); // Re-run when connection or ims changes
-
-    useEffect(() => {
-      if (!connection?.sharedContext?.on) {
-        return
-      }
-      const logSharedContextSnapshot = () => {
-        if (!connection?.sharedContext?.get || !connection?.sharedContext?.keys) {
-          return
-        }
-        const keys = Array.from(connection.sharedContext.keys())
-        const hasIms = Boolean(connection.sharedContext.get('ims'))
-        const hasImsToken = Boolean(connection.sharedContext.get('imsToken'))
-        const hasImsAccessToken = Boolean(connection.sharedContext.get('imsAccessToken'))
-        const hasAccessToken = Boolean(connection.sharedContext.get('accessToken'))
-        const hasToken = Boolean(connection.sharedContext.get('token'))
-        const hasAuthorization = Boolean(connection.sharedContext.get('authorization'))
-        const hasImsOrgId = Boolean(connection.sharedContext.get('imsOrgId'))
-        const hasImsOrg = Boolean(connection.sharedContext.get('imsOrg'))
-        const hasOrgId = Boolean(connection.sharedContext.get('orgId'))
-        const hasOrg = Boolean(connection.sharedContext.get('org'))
-        console.info('[auth] sharedContext keys', keys)
-        console.info('[auth] sharedContext token flags', {
-          hasIms,
-          hasImsToken,
-          hasImsAccessToken,
-          hasAccessToken,
-          hasToken,
-          hasAuthorization,
-          hasImsOrgId,
-          hasImsOrg,
-          hasOrgId,
-          hasOrg
-        })
-      }
-      logSharedContextSnapshot()
-      const handleSharedContextChange = () => {
-        logSharedContextSnapshot()
-      }
-      connection.sharedContext.on('change', handleSharedContextChange)
-      return () => {
-        if (connection?.sharedContext?.off) {
-          connection.sharedContext.off('change', handleSharedContextChange)
-        }
-      }
-    }, [connection])
+  const {
+    connection,
+    authContext,
+    authHeaders,
+    isAuthAvailable
+  } = useAuthContext({ ims: props.ims, extensionId, setIsLoading })
 
   useEffect(() => {
     if (!isAuthAvailable || hasLoadedRef.current) {
       return
     }
     hasLoadedRef.current = true
+    logger.info('[ReviewManager] Token verified, starting fetch...')
     fetchAllReviews(1)
   }, [isAuthAvailable])
 
   useEffect(() => {
-    const headers = getAuthHeaders(authContext)
-    console.warn('[ReviewManager] auth snapshot', {
-      hasToken: Boolean(headers.authorization),
+    logger.debug('[ReviewManager] auth snapshot', {
+      hasToken: Boolean(authHeaders.authorization),
       imsKeys: props.ims ? Object.keys(props.ims) : [],
       isAuthAvailable
     })
-  }, [authContext, props.ims, isAuthAvailable])
+  }, [authHeaders, props.ims, isAuthAvailable])
 
   // Defensive setter for reviews
   const setSafeReviews = (data) => {
@@ -200,12 +126,12 @@ function ReviewManager(props) {
       setReviews([]);
       setTotalCount(0);
       setError(data.body.error);
-      console.error('API error:', data.body.error);
+      logger.error('API error:', data.body.error);
     } else {
       setReviews([]);
       setTotalCount(0);
       setError('Invalid reviews response.');
-      console.error('Invalid reviews response:', data);
+      logger.error('Invalid reviews response:', data);
     }
   };
 
@@ -220,60 +146,53 @@ function ReviewManager(props) {
   };
 
   // Fetch all reviews
-  const fetchAllReviews = async (pageOverride, sortOverride) => {
-    const headers = getAuthHeaders(authContext)
-    if (!headers.authorization) {
+  const fetchReviewList = async (pageOverride, sortOverride, filters = null) => {
+    if (!authHeaders.authorization) {
       setIsLoading(false)
       setError(AUTH_REQUIRED_MESSAGE)
       return
     }
-    setIsLoading(true);
+    setIsLoading(true)
+    setError(null)
     try {
-      const res = await actionWebInvoke(
-        action['review/get-list-reviews'],
-        headers,
-        buildListParams(pageOverride, sortOverride),
-        'post'
-      )
+      const params = buildListParams(pageOverride, sortOverride)
+      if (filters) {
+        Object.keys(filters).forEach((key) => {
+          if (filters[key] !== '' && filters[key] != null) {
+            params[key] = filters[key]
+          }
+        })
+      }
+      const res = await actionWebInvoke(action['review/get-list-reviews'], authHeaders, params, 'post')
       setSafeReviews(res)
     } catch (e) {
-      setError(e.message)
+      setError(e.message || 'Failed to load reviews.')
+      setReviews([])
     }
     setIsLoading(false)
-  };
+  }
 
-  // Fetch reviews by SKU only
+  const fetchAllReviews = async (pageOverride, sortOverride) => {
+    return fetchReviewList(pageOverride, sortOverride)
+  }
+
   const fetchReviews = async (pageOverride, sortOverride) => {
-    const headers = getAuthHeaders(authContext)
-    if (!headers.authorization) {
-      setIsLoading(false);
-      setError(AUTH_REQUIRED_MESSAGE);
-      return;
+    const filters = {
+      sku: searchSku,
+      status: selectedStatus,
+      author: filterAuthor,
+      author_email: filterAuthorEmail,
+      rating: filterRating,
+      text: filterText
     }
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Only search if at least one field is filled
-      if (!searchSku && !selectedStatus && !filterAuthor && !filterAuthorEmail && !filterRating && !filterText) {
-        setReviews([]);
-        setIsLoading(false);
-        return;
-      }
-      const params = buildListParams(pageOverride, sortOverride);
-      if (searchSku) params.sku = searchSku;
-      if (selectedStatus) params.status = selectedStatus;
-      if (filterAuthor) params.author = filterAuthor;
-      if (filterAuthorEmail) params.author_email = filterAuthorEmail;
-      if (filterRating) params.rating = filterRating;
-      if (filterText) params.text = filterText;
-      const res = await actionWebInvoke(action['review/get-list-reviews'], headers, params, 'post');
-      setSafeReviews(res);
-    } catch (e) {
-      setError(e.message || 'Failed to load reviews.');
-      setReviews([]);
+    const hasFilters = Object.values(filters).some((value) => value !== '' && value != null)
+    if (!hasFilters) {
+      setReviews([])
+      setIsLoading(false)
+      return
     }
-    setIsLoading(false);
-  };
+    return fetchReviewList(pageOverride, sortOverride, filters)
+  }
 
   // Helper to refresh reviews after actions
   const refreshReviews = (pageOverride, sortOverride) => {
@@ -390,7 +309,7 @@ function ReviewManager(props) {
   // Listen for configuration changes (user switches org, etc.)
   useEffect(() => {
     const handleConfigChange = ({ imsOrg, imsToken }) => {
-      console.info('Configuration change detected:', { imsOrg, imsToken });
+      logger.debug('Configuration change detected:', { imsOrg, imsToken });
       // Refresh data when auth context changes
       fetchAllReviews();
     };
@@ -554,7 +473,121 @@ function ReviewManager(props) {
     return Array.from(statusSet);
   }, [reviews]);
 
-  const hasHeaders = Boolean(getAuthHeaders(authContext).authorization)
+  const ReviewFilters = ({
+    searchSkuValue,
+    onSearchSku,
+    filterAuthorValue,
+    onFilterAuthor,
+    filterAuthorEmailValue,
+    onFilterAuthorEmail,
+    filterRatingValue,
+    onFilterRating,
+    filterTextValue,
+    onFilterText,
+    selectedStatusValue,
+    onStatusChange,
+    statusOptions,
+    onSearch,
+    onClear
+  }) => (
+    <Flex
+      direction="row"
+      gap="size-150"
+      alignItems="end"
+      UNSAFE_style={{
+        borderBottom: '1px solid var(--spectrum-global-color-gray-300)',
+        paddingBottom: '12px'
+      }}
+    >
+      <TextField label="Search by SKU" value={searchSkuValue} onChange={onSearchSku} width="size-2000" />
+      <TextField label="Author" value={filterAuthorValue} onChange={onFilterAuthor} width="size-1200" />
+      <TextField label="Author Email" value={filterAuthorEmailValue} onChange={onFilterAuthorEmail} width="size-1600" />
+      <NumberField label="Rating" minValue={1} maxValue={5} value={filterRatingValue} onChange={onFilterRating} width="size-800" />
+      <TextField label="Text" value={filterTextValue} onChange={onFilterText} width="size-2000" />
+      <Picker
+        label="Status"
+        selectedKey={selectedStatusValue}
+        onSelectionChange={onStatusChange}
+        width="size-2400"
+        placeholder="All Statuses"
+      >
+        <Item key="" textValue="All Statuses">All Statuses</Item>
+        {statusOptions && statusOptions.map(status => (
+          <Item key={status} textValue={String(status)}>{status}</Item>
+        ))}
+      </Picker>
+      <Button variant="primary" onPress={onSearch}>Search</Button>
+      <Button variant="secondary" onPress={onClear}>Clear</Button>
+    </Flex>
+  )
+
+  const ReviewMassActions = ({
+    selectedMassActionValue,
+    onMassActionChange,
+    selectedCount,
+    total,
+    pageSizeValue,
+    onPageSizeChange,
+    pageSizeOptionsValue,
+    currentPageValue,
+    totalPagesValue,
+    onPrevPage,
+    onNextPage,
+    onPageChange
+  }) => (
+    <Flex direction="row" justifyContent="space-between" alignItems="center">
+      <Flex direction="row" gap="size-150" alignItems="end" UNSAFE_className="m2-mass-actions-inner">
+        <Picker
+          aria-label="Mass actions"
+          selectedKey={selectedMassActionValue}
+          onSelectionChange={onMassActionChange}
+          width="size-2000"
+          placeholder="Actions"
+        >
+          <Item key="" textValue="Actions">Actions</Item>
+          <Item key="approve" textValue="Approve">Approve</Item>
+          <Item key="reject" textValue="Reject">Reject</Item>
+          <Item key="delete" textValue="Delete">Delete</Item>
+        </Picker>
+        <Text>{`${total} records found${selectedCount > 0 ? ` (${selectedCount} selected)` : ''}`}</Text>
+      </Flex>
+      <Flex direction="row" gap="size-200" alignItems="center">
+        <Picker
+          aria-label="Rows per page"
+          selectedKey={String(pageSizeValue)}
+          onSelectionChange={onPageSizeChange}
+          width="size-1200"
+        >
+          {pageSizeOptionsValue.map(size => (
+            <Item key={String(size)} textValue={String(size)}>{size}</Item>
+          ))}
+        </Picker>
+        per page
+        <ButtonGroup>
+          <Button variant="secondary" isDisabled={currentPageValue === 1} onPress={onPrevPage}>Previous</Button>
+        </ButtonGroup>
+        <Text>
+          Page{' '}
+          <input
+            type="number"
+            min={1}
+            max={totalPagesValue}
+            value={currentPageValue}
+            aria-label="Page number"
+            onChange={onPageChange}
+            onBlur={onPageChange}
+            style={{ width: '3em', textAlign: 'center', margin: '0 0.3em' }}
+          />
+          {' '}of {totalPagesValue}
+        </Text>
+        <ButtonGroup>
+          <Button variant="secondary" isDisabled={currentPageValue === totalPagesValue} onPress={onNextPage}>Next</Button>
+        </ButtonGroup>
+      </Flex>
+    </Flex>
+  )
+
+  const hasHeaders = Boolean(authHeaders.authorization)
   if (!connection && !hasHeaders) {
     return (
       <Flex alignItems="center" justifyContent="center" height="100vh">
@@ -609,7 +642,7 @@ function ReviewManager(props) {
               <ProgressCircle aria-label="Loading…" isIndeterminate size="L" />
             </div>
         )}
-        {isShellContextActive && (
+        {!isCommerceAdmin && (
           <h2 className="ac-title" style={{ marginBottom: 24 }}>Product Reviews</h2>
         )}
 
@@ -657,94 +690,74 @@ function ReviewManager(props) {
           </div>
         )}
 
-        {/* Unified background wrapping Filter and Mass Actions toolbars */}
         <Flex direction="column" gap="size-200" marginBottom="size-200">
-          {/* Search Toolbar without gray background class */}
-          <Flex
-            direction="row"
-            gap="size-150"
-            alignItems="end"
-            UNSAFE_style={{
-              borderBottom: '1px solid var(--spectrum-global-color-gray-300)',
-              paddingBottom: '12px'
+          <ReviewFilters
+            searchSkuValue={searchSku}
+            onSearchSku={setSearchSku}
+            filterAuthorValue={filterAuthor}
+            onFilterAuthor={setFilterAuthor}
+            filterAuthorEmailValue={filterAuthorEmail}
+            onFilterAuthorEmail={setFilterAuthorEmail}
+            filterRatingValue={filterRating}
+            onFilterRating={setFilterRating}
+            filterTextValue={filterText}
+            onFilterText={setFilterText}
+            selectedStatusValue={selectedStatus}
+            onStatusChange={setSelectedStatus}
+            statusOptions={availableStatuses}
+            onSearch={() => { setCurrentPage(1); fetchReviews(1); }}
+            onClear={() => {
+              setSearchSku('');
+              setFilterAuthor('');
+              setFilterAuthorEmail('');
+              setFilterRating(null);
+              setFilterText('');
+              setSelectedStatus('');
+              setCurrentPage(1);
+              fetchAllReviews(1);
             }}
-          >
-            <TextField label="Search by SKU" value={searchSku} onChange={setSearchSku} width="size-2000" />
-            <TextField label="Author" value={filterAuthor} onChange={setFilterAuthor} width="size-1200" />
-            <TextField label="Author Email" value={filterAuthorEmail} onChange={setFilterAuthorEmail} width="size-1600" />
-            <NumberField label="Rating" minValue={1} maxValue={5} value={filterRating} onChange={setFilterRating} width="size-800" />
-            <TextField label="Text" value={filterText} onChange={setFilterText} width="size-2000" />
-            <Picker label="Status" selectedKey={selectedStatus} onSelectionChange={setSelectedStatus} width="size-2400" placeholder="All Statuses">
-              <Item key="" textValue="All Statuses">All Statuses</Item>
-              {availableStatuses && availableStatuses.map(status => (
-                <Item key={status} textValue={String(status)}>{status}</Item>
-              ))}
-            </Picker>
-            <Button variant="primary" onPress={() => { setCurrentPage(1); fetchReviews(1); }}>Search</Button>
-            <Button variant="secondary" onPress={() => { setSearchSku(''); setFilterAuthor(''); setFilterAuthorEmail(''); setFilterRating(null); setFilterText(''); setSelectedStatus(''); setCurrentPage(1); fetchAllReviews(1); }}>Clear</Button>
-          </Flex>
-
-          {/* Mass Actions Toolbar without gray background class */}
-          <Flex direction="row" justifyContent="space-between" alignItems="center">
-            <Flex direction="row" gap="size-150" alignItems="end" UNSAFE_className="m2-mass-actions-inner">
-              <Picker selectedKey={selectedMassAction} onSelectionChange={(key) => {
-                if (!key) { setSelectedMassAction(''); return; }
-                if (selectedIds.length === 0) { setSelectedMassAction(''); return; }
-                setSelectedMassAction(key);
-                (async () => {
-                  if (key === 'approve') { await handleMassApprove(); }
-                  else if (key === 'reject') { await handleMassReject(); }
-                  else if (key === 'delete') { await handleMassDelete(); }
-                  setSelectedMassAction('');
-                })();
-              }} width="size-2000" placeholder="Actions">
-                <Item key="" textValue="Actions">Actions</Item>
-                <Item key="approve" textValue="Approve">Approve</Item>
-                <Item key="reject" textValue="Reject">Reject</Item>
-                <Item key="delete" textValue="Delete">Delete</Item>
-              </Picker>
-            <Text>{`${totalCount} records found${selectedIds.length > 0 ? ` (${selectedIds.length} selected)` : ''}`}</Text>
-            </Flex>
-            <Flex direction="row" gap="size-200" alignItems="center">
-              <Picker selectedKey={String(pageSize)} onSelectionChange={key => setPageSize(Number(key))} width="size-1200">
-                {pageSizeOptions.map(size => (<Item key={String(size)} textValue={String(size)}>{size}</Item>))}
-              </Picker>
-              per page
-              <ButtonGroup>
-                <Button variant="secondary" isDisabled={currentPage === 1} onPress={() => { const nextPage = currentPage - 1; setCurrentPage(nextPage); refreshReviews(nextPage); }}>Previous</Button>
-              </ButtonGroup>
-              {/* Replace static page number with input */}
-              <Text>
-                Page{' '}
-                <input
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={currentPage}
-                  aria-label="Page number"
-                  onChange={e => {
-                    let val = Number(e.target.value);
-                    if (val >= 1 && val <= totalPages) {
-                      setCurrentPage(val);
-                      refreshReviews(val);
-                    }
-                  }}
-                  onBlur={e => {
-                    let val = Number(e.target.value);
-                    if (val < 1) val = 1;
-                    if (val > totalPages) val = totalPages;
-                    setCurrentPage(val);
-                    refreshReviews(val);
-                  }}
-                  style={{ width: '3em', textAlign: 'center', margin: '0 0.3em' }}
-                />
-                {' '}of {totalPages}
-              </Text>
-              <ButtonGroup>
-                <Button variant="secondary" isDisabled={currentPage === totalPages} onPress={() => { const nextPage = currentPage + 1; setCurrentPage(nextPage); refreshReviews(nextPage); }}>Next</Button>
-              </ButtonGroup>
-            </Flex>
-          </Flex>
+          />
+          <ReviewMassActions
+            selectedMassActionValue={selectedMassAction}
+            onMassActionChange={(key) => {
+              if (!key) { setSelectedMassAction(''); return; }
+              if (selectedIds.length === 0) { setSelectedMassAction(''); return; }
+              setSelectedMassAction(key);
+              (async () => {
+                if (key === 'approve') { await handleMassApprove(); }
+                else if (key === 'reject') { await handleMassReject(); }
+                else if (key === 'delete') { await handleMassDelete(); }
+                setSelectedMassAction('');
+              })();
+            }}
+            selectedCount={selectedIds.length}
+            total={totalCount}
+            pageSizeValue={pageSize}
+            onPageSizeChange={key => setPageSize(Number(key))}
+            pageSizeOptionsValue={pageSizeOptions}
+            currentPageValue={currentPage}
+            totalPagesValue={totalPages}
+            onPrevPage={() => {
+              const nextPage = currentPage - 1;
+              setCurrentPage(nextPage);
+              refreshReviews(nextPage);
+            }}
+            onNextPage={() => {
+              const nextPage = currentPage + 1;
+              setCurrentPage(nextPage);
+              refreshReviews(nextPage);
+            }}
+            onPageChange={e => {
+              let val = Number(e.target.value);
+              if (Number.isNaN(val)) {
+                return;
+              }
+              if (val < 1) val = 1;
+              if (val > totalPages) val = totalPages;
+              setCurrentPage(val);
+              refreshReviews(val);
+            }}
+          />
         </Flex>
 
         {/* Reviews Table (original simplified version remains) */}

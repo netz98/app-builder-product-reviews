@@ -5,6 +5,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './components/App'
 import './ac-backend-theme.css'
+import { logger } from '../utils/log'
 
 window.React = require('react')
 
@@ -27,13 +28,13 @@ const isCommerceAdmin = Array.from(ancestorOrigins).some((origin) => origin.incl
 const isShell = Array.from(ancestorOrigins).some((origin) => origin.includes('experience.adobe.com')) ||
     referrer.includes('experience.adobe.com')
 
-console.info('[bootstrap] isLocal:', isLocal)
-console.info('[bootstrap] isTopLevel:', isTopLevel)
-console.info('[bootstrap] isInIframe:', isInIframe)
-console.info('[bootstrap] isShell:', isShell)
-console.info('[bootstrap] isCommerceAdmin:', isCommerceAdmin)
-console.info('[bootstrap] ancestorOrigins:', Array.from(ancestorOrigins))
-console.info('[bootstrap] referrer:', referrer)
+logger.debug('[bootstrap] isLocal:', isLocal)
+logger.debug('[bootstrap] isTopLevel:', isTopLevel)
+logger.debug('[bootstrap] isInIframe:', isInIframe)
+logger.debug('[bootstrap] isShell:', isShell)
+logger.debug('[bootstrap] isCommerceAdmin:', isCommerceAdmin)
+logger.debug('[bootstrap] ancestorOrigins:', Array.from(ancestorOrigins))
+logger.debug('[bootstrap] referrer:', referrer)
 
 if (isTopLevel && !isLocal && !isCommerceAdmin) {
     // Force redirect to Shell for Production standalone access
@@ -53,18 +54,18 @@ function bootstrapApp() {
         try {
             require('./exc-runtime')
         } catch (e) {
-            console.warn('[bootstrap] exc-runtime load failed', e)
+            logger.warn('[bootstrap] exc-runtime load failed', e)
         }
         const { default: Runtime, init } = require('@adobe/exc-app')
         init(() => {
             const runtime = Runtime()
             const readyTimeout = setTimeout(() => {
-                console.warn('[bootstrap] runtime ready timeout')
+                logger.warn('[bootstrap] runtime ready timeout')
             }, 10000)
             runtime.on('ready', (ims) => {
                 clearTimeout(readyTimeout)
                 runtime.done() // This MUST be called to stop the 408 timeout
-                console.warn('[bootstrap] runtime ready', {
+                logger.debug('[bootstrap] runtime ready', {
                     hasIms: Boolean(ims),
                     imsKeys: ims ? Object.keys(ims) : []
                 })
@@ -73,7 +74,7 @@ function bootstrapApp() {
                     token: ims.imsToken || ims.token,
                     org: ims.imsOrg || ims.org
                 }
-                console.warn('[bootstrap] normalized IMS', {
+                logger.debug('[bootstrap] normalized IMS', {
                     hasToken: Boolean(normalizedIms.token),
                     hasOrg: Boolean(normalizedIms.org)
                 })

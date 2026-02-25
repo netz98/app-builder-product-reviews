@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { register } from '@adobe/uix-guest'
-import {Route} from "react-router-dom";
 import ReviewManager from "./ReviewManager";
 
 export const extensionId = 'review'
