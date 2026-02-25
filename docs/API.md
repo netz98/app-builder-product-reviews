@@ -655,3 +655,8 @@ Complete API endpoints:
 **Next Steps:**
 - For GraphQL integration, see [GRAPHQL.md](GRAPHQL.md)
 - For authentication details, see [AUTHENTICATION.md](AUTHENTICATION.md)
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

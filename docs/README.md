@@ -140,3 +140,8 @@ All documentation provides curl examples that can be easily adapted to PHP HTTP 
 - [Adobe I/O Runtime Documentation](https://developer.adobe.com/runtime/docs/)
 - [GraphQL Mesh Documentation](https://www.graphql-mesh.com/)
 - [React Spectrum Documentation](https://react-spectrum.adobe.com/)
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

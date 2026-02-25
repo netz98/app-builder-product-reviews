@@ -692,3 +692,8 @@ GraphQL Mesh provides:
 - For REST API details, see [API.md](API.md)
 - For authentication details, see [AUTHENTICATION.md](AUTHENTICATION.md)
 - For UI integration, see [UI.md](UI.md)
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

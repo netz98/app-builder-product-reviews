@@ -628,3 +628,8 @@ Common troubleshooting areas:
 - Check logs for error details
 - Verify configuration settings
 - Test in isolation when possible
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

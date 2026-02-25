@@ -500,3 +500,8 @@ You now have:
 1. Read [AUTHENTICATION.md](AUTHENTICATION.md) to understand authentication
 2. Read [API.md](API.md) to learn about API endpoints
 3. Run `aio app run` to start development
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

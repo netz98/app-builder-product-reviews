@@ -522,3 +522,8 @@ UI Features:
 - For API details, see [API.md](API.md)
 - For authentication, see [AUTHENTICATION.md](AUTHENTICATION.md)
 - For GraphQL integration, see [GRAPHQL.md](GRAPHQL.md)
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

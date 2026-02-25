@@ -419,3 +419,8 @@ Security Features:
 - [Adobe Security Best Practices](https://www.adobe.com/devnet-docs/acrobatetk/tools/Sign/Security/overview.html)
 - [OWASP Security Guidelines](https://owasp.org/www-project-top-ten/)
 - [Node.js Security Best Practices](https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html)
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

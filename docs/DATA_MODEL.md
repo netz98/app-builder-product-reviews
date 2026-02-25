@@ -428,3 +428,8 @@ Data Model Features:
 - For API usage, see [API.md](API.md)
 - For storage details, see code in `actions/state-repository.js`
 - For validation, see code in `actions/review.js`
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).

@@ -453,3 +453,8 @@ Authentication in this application:
 1. For API details, see [API.md](API.md)
 2. For GraphQL integration, see [GRAPHQL.md](GRAPHQL.md)
 3. For security details, see [SECURITY.md](SECURITY.md)
+
+---
+
+## UI logging
+UI log level is controlled via `window.APP_CONFIG.LOG_LEVEL` in `web-src/index.html` (e.g. `debug`, `info`, `warn`, `error`).
