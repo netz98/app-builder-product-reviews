@@ -12,8 +12,8 @@ import {
 } from '../../utils/auth';
 import action from '../config.json';
 import '../ac-backend-theme.css';
-import { attach } from '@adobe/uix-guest'
 import { extensionId } from './ExtensionRegistration';
+import { attach } from '@adobe/uix-guest'
 
 import {
   ProgressCircle,
@@ -118,25 +118,22 @@ function ReviewManager(props) {
     //     }
     //     fetchCredentials()
     // }, [props])
-    useEffect(() => {
 
-        const ancestorOrigins = window.location?.ancestorOrigins || []
-        const referrer = document.referrer || ''
-        const isCommerceAdmin = Array.from(ancestorOrigins).some((origin) => origin.includes('admin.commerce.adobe.com')) ||
-            referrer.includes('admin.commerce.adobe.com')
-        if (!isCommerceAdmin) {
-            return
-        }
+    useEffect(() => {
         const fetchCredentials = async () => {
-            if (!props.ims.token) {
+            if (!props?.ims?.token) {
                 const guestConnection = await attach({ id: extensionId });
                 props.ims.token = guestConnection?.sharedContext?.get('imsToken');
                 props.ims.org = guestConnection?.sharedContext?.get('imsOrgId');
+                setConnection(guestConnection || null)
             }
             setIsLoading(false);
         };
 
-        fetchCredentials();
+        fetchCredentials().catch((error) => {
+            console.warn('[auth] Failed to attach guest connection', error)
+            setIsLoading(false)
+        })
     }, []);
 
 // 2. TRIGGER FETCH (The missing piece)
@@ -600,13 +597,13 @@ function ReviewManager(props) {
   }
   if (!isAuthAvailable) {
     return (
-      <Flex alignItems="center" justifyContent="center" height="100vh">
-        <div className="ac-content-card" style={{ padding: '20px' }}>
-          <Text>{AUTH_REQUIRED_MESSAGE}</Text>
-        </div>
-      </Flex>
-    )
-  }
+       <Flex alignItems="center" justifyContent="center" height="100vh">
+         <div className="ac-content-card" style={{ padding: '20px' }}>
+           <Text>{AUTH_REQUIRED_MESSAGE}</Text>
+         </div>
+       </Flex>
+     )
+   }
 
   if (error) {
     let errorMsg = error;
@@ -694,7 +691,15 @@ function ReviewManager(props) {
         {/* Unified background wrapping Filter and Mass Actions toolbars */}
         <Flex direction="column" gap="size-200" marginBottom="size-200">
           {/* Search Toolbar without gray background class */}
-          <Flex direction="row" gap="size-150" alignItems="end" style={{ borderBottom: '1px solid var(--spectrum-global-color-gray-300)', paddingBottom: '12px' }}>
+          <Flex
+            direction="row"
+            gap="size-150"
+            alignItems="end"
+            UNSAFE_style={{
+              borderBottom: '1px solid var(--spectrum-global-color-gray-300)',
+              paddingBottom: '12px'
+            }}
+          >
             <TextField label="Search by SKU" value={searchSku} onChange={setSearchSku} width="size-2000" />
             <TextField label="Author" value={filterAuthor} onChange={setFilterAuthor} width="size-1200" />
             <TextField label="Author Email" value={filterAuthorEmail} onChange={setFilterAuthorEmail} width="size-1600" />
@@ -747,6 +752,7 @@ function ReviewManager(props) {
                   min={1}
                   max={totalPages}
                   value={currentPage}
+                  aria-label="Page number"
                   onChange={e => {
                     let val = Number(e.target.value);
                     if (val >= 1 && val <= totalPages) {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Provider, defaultTheme } from '@adobe/react-spectrum'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Route, Routes, HashRouter } from 'react-router-dom'
@@ -12,20 +12,20 @@ function App (props) {
         hasRuntime: Boolean(props?.runtime)
     })
     return (
-        <ErrorBoundary FallbackComponent={fallbackComponent}>
+        <ErrorBoundary FallbackComponent={fallbackComponent} onError={onError}>
             <HashRouter>
                 <Provider theme={defaultTheme} colorScheme={'light'}>
-                    <ExtensionRegistration />
                     <Routes>
-                        <Route index element={<ReviewManager ims={props.ims} runtime={props.runtime} />} />
+                        <Route index element={<ExtensionRegistration ims={props.ims} runtime={props.runtime} />} />
                         {/* Admin UI SDK path (referenced in ExtensionRegistration.js) */}
-                        <Route path='review-manager' element={<ReviewManager ims={props.ims} runtime={props.runtime} />} />
-                        <Route path='index.html' element={<div />} /> {/* Silence registration page */}
                     </Routes>
                 </Provider>
             </HashRouter>
         </ErrorBoundary>
     )
+
+    // error handler on UI rendering failure
+    function onError(e, componentStack) {}
 
     function fallbackComponent({ componentStack, error }) {
         return (
