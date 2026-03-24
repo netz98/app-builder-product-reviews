@@ -21,6 +21,7 @@ async function main(params) {
     let results = {};
 
     const repo = new StateRepository({
+        params,
         region: params.AIO_DB_REGION // Explicitly pass from action inputs
     });
 

@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+const { AuthClient } = require('@adobe/aio-sdk-core');
 const dbLib = require('@adobe/aio-lib-db');
 
 const sharedConnections = new Map();
@@ -14,7 +16,11 @@ class StateRepository {
     if (!this._collection) {
       const region = this.options.region || process.env.AIO_DB_REGION || 'emea';
       const collectionName = this.options.collection || 'reviews';
-      const connectionKey = `${region}::${collectionName}`;
+      const token = await this.getAccessToken();
+      const tokenKey = token
+        ? crypto.createHash('sha256').update(token).digest('hex')
+        : 'no-token';
+      const connectionKey = `${region}::${collectionName}::${tokenKey}`;
       if (sharedConnections.has(connectionKey)) {
         const shared = sharedConnections.get(connectionKey);
         this._db = shared.db;
@@ -23,7 +29,8 @@ class StateRepository {
         return this;
       }
 
-      this._db = await dbLib.init({ region });
+      const initOptions = token ? { region, token } : { region };
+      this._db = await dbLib.init(initOptions);
       this._client = await this._db.connect();
       this._collection = await this._client.collection(collectionName);
       sharedConnections.set(connectionKey, {
@@ -33,6 +40,22 @@ class StateRepository {
       });
     }
     return this;
+  }
+
+  async getAccessToken() {
+    if (this.options.token) {
+      return this.options.token;
+    }
+    if (this.options.params) {
+      if (this.options.params.__ow_ims_access_token) {
+        return this.options.params.__ow_ims_access_token;
+      }
+      if (AuthClient && typeof AuthClient.generateAccessToken === 'function') {
+        const token = await AuthClient.generateAccessToken(this.options.params);
+        return token.access_token;
+      }
+    }
+    return null;
   }
 
   async get(key) {

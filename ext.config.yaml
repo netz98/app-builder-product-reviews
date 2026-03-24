@@ -5,6 +5,9 @@ operations:
 actions: actions
 web: web-src
 runtimeManifest:
+  database:
+    auto-provision: true
+    region: emea
   packages:
     admin-ui-sdk:
       license: Apache-2.0
@@ -19,8 +22,6 @@ runtimeManifest:
             require-adobe-auth: false
             final: true
     review:
-      annotations:
-        use-storage-class: CosmosDB
       actions:
         create-review:
           function: actions/create-review/index.js
@@ -31,6 +32,7 @@ runtimeManifest:
             LOG_LEVEL: $LOG_LEVEL
           annotations:
             require-adobe-auth: true
+            include-ims-credentials: true
         get-list-reviews:
           function: actions/get-list-reviews/index.js
           web: 'yes'
@@ -40,6 +42,7 @@ runtimeManifest:
             LOG_LEVEL: $LOG_LEVEL
           annotations:
             require-adobe-auth: true
+            include-ims-credentials: true
         state-test:
           function: actions/state-test/index.js
           web: 'yes'
@@ -49,6 +52,7 @@ runtimeManifest:
             LOG_LEVEL: $LOG_LEVEL
           annotations:
             require-adobe-auth: true
+            include-ims-credentials: true
         get-reviews-by-ids:
           function: actions/get-reviews-by-ids/index.js
           web: 'yes'
@@ -58,6 +62,7 @@ runtimeManifest:
             LOG_LEVEL: $LOG_LEVEL
           annotations:
             require-adobe-auth: true
+            include-ims-credentials: true
         update-reviews:
           function: actions/update-reviews/index.js
           web: 'yes'
@@ -67,6 +72,7 @@ runtimeManifest:
             LOG_LEVEL: $LOG_LEVEL
           annotations:
             require-adobe-auth: true
+            include-ims-credentials: true
         delete-reviews-by-ids:
           function: actions/delete-reviews-by-ids/index.js
           web: 'yes'
@@ -76,6 +82,7 @@ runtimeManifest:
             LOG_LEVEL: $LOG_LEVEL
           annotations:
             require-adobe-auth: true
+            include-ims-credentials: true
       apis:
         create-review: # API name
           v1:

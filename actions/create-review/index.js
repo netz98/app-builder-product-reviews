@@ -6,6 +6,7 @@ const { requireAuth } = require('../auth');
 
 async function main(params) {
   const logger = Core.Logger('create-review', { level: params.LOG_LEVEL || 'warn' });
+  const runtimeParams = params;
   
   // AUTHENTICATION CHECK
   const authResult = requireAuth(params, logger);
@@ -24,7 +25,7 @@ async function main(params) {
     }
 
     // 2. Initialize repository
-    repo = new StateRepository();
+    repo = new StateRepository({ params: runtimeParams });
     await repo.init();
     logger.debug(`State review before put: ${JSON.stringify(newReview)}`);
 

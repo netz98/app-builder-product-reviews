@@ -6,6 +6,7 @@ const { requireAuth } = require('../auth');
 
 async function main(params) {
   const logger = Core.Logger('get-list-reviews', { level: params.LOG_LEVEL || 'warn' });
+  const runtimeParams = params;
   // Log all headers received by the action for debugging
   logger.debug('Received __ow_headers:', params.__ow_headers);
 
@@ -20,7 +21,7 @@ async function main(params) {
 
   try {
     const reviews = [];
-    repo = new StateRepository();
+    repo = new StateRepository({ params: runtimeParams });
     await repo.init();
 
     const query = {};

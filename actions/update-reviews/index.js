@@ -6,6 +6,7 @@ const { requireAuth } = require('../auth');
 
 async function main(params) {
     const logger = Core.Logger('update-reviews', { level: params.LOG_LEVEL || 'warn' });
+    const runtimeParams = params;
   
     // AUTHENTICATION CHECK
     const authResult = requireAuth(params, logger);
@@ -22,7 +23,7 @@ async function main(params) {
 
   let repo;
   try {
-    repo = new StateRepository();
+    repo = new StateRepository({ params: runtimeParams });
     await repo.init();
     const results = [];
 
