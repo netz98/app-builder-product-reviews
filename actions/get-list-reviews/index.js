@@ -7,9 +7,6 @@ const { requireAuth } = require('../auth');
 async function main(params) {
   const logger = Core.Logger('get-list-reviews', { level: params.LOG_LEVEL || 'warn' });
   const runtimeParams = params;
-  // Log all headers received by the action for debugging
-  logger.debug('Received __ow_headers:', params.__ow_headers);
-
   // AUTHENTICATION CHECK
   const authResult = requireAuth(params, logger);
   if (!authResult.success) {
