@@ -27,15 +27,21 @@ async function main(params) {
     for (const key of filterKeys) {
       const value = params[key];
       if (value === undefined || value === null || value === '') continue;
+
+      const normalizedValue = typeof value === 'string' ? value.trim() : value;
+      if (normalizedValue === '') {
+        continue;
+      }
+
       if (key === 'rating') {
-        const numericRating = parseInt(value, 10);
+        const numericRating = parseInt(normalizedValue, 10);
         if (!Number.isNaN(numericRating)) {
           query[key] = numericRating;
         }
       } else if (key === 'status') {
-        query[key] = { $regex: `^${escapeRegex(value)}$`, $options: 'i' };
+        query[key] = { $regex: `^${escapeRegex(normalizedValue)}$`, $options: 'i' };
       } else {
-        query[key] = { $regex: String(value), $options: 'i' };
+        query[key] = { $regex: escapeRegex(normalizedValue), $options: 'i' };
       }
     }
 

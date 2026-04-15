@@ -187,9 +187,7 @@ function ReviewManager(props) {
     }
     const hasFilters = Object.values(filters).some((value) => value !== '' && value != null)
     if (!hasFilters) {
-      setReviews([])
-      setIsLoading(false)
-      return
+      return fetchAllReviews(pageOverride, sortOverride)
     }
     return fetchReviewList(pageOverride, sortOverride, filters)
   }

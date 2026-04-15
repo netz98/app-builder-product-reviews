@@ -16,6 +16,7 @@ describe('errorResponse', () => {
     const res = utils.errorResponse(400, 'errorMessage')
     expect(res).toEqual({
       statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
       body: { error: 'errorMessage' }
     })
   })
@@ -28,6 +29,7 @@ describe('errorResponse', () => {
     expect(logger.info).toHaveBeenCalledWith('400: errorMessage')
     expect(res).toEqual({
       statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
       body: { error: 'errorMessage' }
     })
   })
