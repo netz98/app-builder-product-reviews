@@ -1,4 +1,3 @@
-import React from 'react'
 import { Provider, defaultTheme } from '@adobe/react-spectrum'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Route, Routes, HashRouter } from 'react-router-dom'
@@ -25,9 +24,9 @@ function App (props) {
     )
 
     // error handler on UI rendering failure
-    function onError(e, componentStack) {}
+    function onError() {}
 
-    function fallbackComponent({ componentStack, error }) {
+    function fallbackComponent({ error }) {
         return (
             <div>
                 <h1>Something went wrong :(</h1>

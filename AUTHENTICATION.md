@@ -193,9 +193,9 @@ Test authentication scenarios:
 Enable logging to see injected headers:
 
 ```javascript
-console.log('Auth headers being sent:', {
-  authorization: `Bearer ${props.ims?.token?.substring(0, 20)}...`,
-  'x-gw-ims-org-id': props.ims?.org
+console.log('Auth context present:', {
+  hasToken: Boolean(props.ims?.token),
+  hasOrg: Boolean(props.ims?.org)
 });
 ```
 

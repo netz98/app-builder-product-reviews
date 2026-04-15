@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { actionWebInvoke, isCommerceAdminContext } from '../../utils';
 import { isRequiredFieldValid, isRatingValid, isEmailValid } from '../../reviewValidator.js';
 import {
@@ -307,7 +307,10 @@ function ReviewManager(props) {
   // Listen for configuration changes (user switches org, etc.)
   useEffect(() => {
     const handleConfigChange = ({ imsOrg, imsToken }) => {
-      logger.debug('Configuration change detected:', { imsOrg, imsToken });
+      logger.debug('Configuration change detected:', {
+        hasImsOrg: Boolean(imsOrg),
+        hasImsToken: Boolean(imsToken)
+      });
       // Refresh data when auth context changes
       fetchAllReviews();
     };

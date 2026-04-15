@@ -80,6 +80,19 @@ aio app run
 | `aio app undeploy` | Remove from current workspace |
 | `aio app use --list` | Show current workspace config |
 
+## Mesh Deployment Note
+
+- `mesh.json` may contain `{NAMESPACE}` as a template placeholder.
+- Use the helper script to render namespace and update Mesh for the active workspace:
+
+```bash
+npm run mesh:update
+```
+
+- Optional: override namespace explicitly, for example `NAMESPACE=<your-namespace> npm run mesh:update`.
+- You can also set namespace directly in `mesh.json` and run `aio api-mesh update mesh.json`, but do not commit namespace-specific values.
+- Keep `mesh.json` in git as template and do not commit `mesh.generated.json`.
+
 ## Documentation
 
 ### Core Guides
@@ -102,12 +115,12 @@ aio app run
 
 ## API Overview
 
-Base URL: `https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app`
+Base URL: `https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review`
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/create-review` | POST | Create a new review |
-| `/update-reviews` | POST | Batch update reviews |
+| `/update-reviews` | PUT | Batch update reviews |
 | `/delete-reviews-by-ids` | POST | Batch delete reviews |
 | `/get-list-reviews` | POST | List reviews with filters, pagination, sorting |
 | `/get-reviews-by-ids` | POST | Fetch reviews by IDs |

@@ -5,14 +5,14 @@ const { Config } = require('@adobe/aio-sdk').Core;
 const fetch = require('node-fetch');
 const namespace = Config.get('runtime.namespace');
 const hostname = Config.get('cna.hostname') || 'adobeioruntime.net';
-const runtimePackage = 'review-app';
+const runtimePackage = 'review';
 const actionUrl = `https://${namespace}.${hostname}/api/v1/web/${runtimePackage}/update-reviews`;
 const { getAuthHeaders } = require('./test-helper');
 
 describe('update-reviews E2E', () => {
   it('returns 401 if missing authentication', async () => {
     const res = await fetch(actionUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' }
     });
     expect(res.status).toBe(401);
@@ -20,7 +20,7 @@ describe('update-reviews E2E', () => {
 
   it('returns 400 if reviews array is missing', async () => {
     const res = await fetch(actionUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify({})
     });
@@ -31,7 +31,7 @@ describe('update-reviews E2E', () => {
 
   it('returns 400 if reviews array is empty', async () => {
     const res = await fetch(actionUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify({ reviews: [] })
     });
@@ -42,7 +42,7 @@ describe('update-reviews E2E', () => {
 
   it('returns 400 if review id is missing', async () => {
     const res = await fetch(actionUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify({ reviews: [{ status: 'approved' }] })
     });
@@ -55,7 +55,7 @@ describe('update-reviews E2E', () => {
   it('returns 200 and results array for valid updates', async () => {
     // Use a fake id for test; in a real test, create a review first
     const res = await fetch(actionUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify({ reviews: [{ id: 'fake-id-e2e', status: 'approved' }] })
     });
@@ -65,4 +65,3 @@ describe('update-reviews E2E', () => {
     expect(body.results[0]).toHaveProperty('id', 'fake-id-e2e');
   });
 });
-

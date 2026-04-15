@@ -250,6 +250,39 @@ This will:
 - Upload static files to CDN
 - Configure GraphQL Mesh endpoints
 
+### Mesh Placeholder Configuration (`NICE-3`)
+
+The tracked `mesh.json` can contain a namespace placeholder (for example `{NAMESPACE}`) to keep the repository environment-agnostic.
+Adobe Mesh commands require a fully qualified domain.
+
+**Recommended (scripted):**
+```bash
+npm run mesh:update
+```
+
+This script:
+- resolves namespace from `aio config get runtime.namespace` (or `NAMESPACE` env var if set)
+- generates `mesh.generated.json`
+- runs `aio api-mesh update mesh.generated.json`
+
+You can override namespace explicitly:
+```bash
+NAMESPACE=<your-namespace> npm run mesh:update
+```
+
+**Manual alternative:**
+```bash
+NAMESPACE=$(aio config get runtime.namespace)
+sed "s|{NAMESPACE}|$NAMESPACE|g" mesh.json > mesh.generated.json
+aio api-mesh update mesh.generated.json
+```
+
+**Important:**
+- Keep `mesh.json` as template in git.
+- Do not commit `mesh.generated.json`.
+- Re-generate after switching workspace with `aio app use`.
+- You may temporarily set namespace directly in `mesh.json` and deploy it, but do not commit namespace-specific values.
+
 **Undeploy (remove from production):**
 ```bash
 aio app undeploy
@@ -289,7 +322,7 @@ Current Configuration:
   Organization: Company B (OrgB@AdobeOrg)
   Project: Product Review App
   Workspace: Production
-  Runtime Namespace: 714154-545silverhare
+  Runtime Namespace: {YOUR_RUNTIME_NAMESPACE}
 ```
 
 #### Switching Between Environments

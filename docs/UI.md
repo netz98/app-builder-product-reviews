@@ -145,10 +145,10 @@ props.ims = {
 const { ims } = props;
 
 // API call with auth headers
-const response = await fetch('/api/v1/web/review-app/get-list-reviews', {
+const response = await fetch('/api/v1/web/review/get-list-reviews', {
   method: 'POST',
   headers: {
-    'Authorization': ims.token,
+    'Authorization': `Bearer ${ims.token}`,
     'x-gw-ims-org-id': ims.org,
     'Content-Type': 'application/json'
   },
@@ -184,7 +184,7 @@ x-gw-ims-org-id: {ORG_ID}
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/create-review" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/create-review" \
   -H "Authorization: Bearer {TOKEN_FROM_MAGENTO_SESSION}" \
   -H "x-gw-ims-org-id: {ORG_FROM_MAGENTO_CONFIG}" \
   -H "Content-Type: application/json" \
@@ -254,7 +254,7 @@ class ReviewsApiClient {
 
 // Usage
 $api = new ReviewsApiClient(
-    'https://NAMESPACE.adobeioruntime.net/api/v1/web/review-app',
+    'https://NAMESPACE.adobeioruntime.net/api/v1/web/review',
     $imsToken,  // Get from your session or OAuth flow
     $orgId      // Get from your configuration
 );
@@ -309,10 +309,10 @@ import { ActionButton, Form, TextField } from '@adobe/react-spectrum';
 
 export function ReviewForm({ onSubmit, ims }) {
   const handleSubmit = async (data) => {
-    const response = await fetch('/api/v1/web/review-app/create-review', {
+    const response = await fetch('/api/v1/web/review/create-review', {
       method: 'POST',
       headers: {
-        'Authorization': ims.token,
+        'Authorization': `Bearer ${ims.token}`,
         'x-gw-ims-org-id': ims.org,
         'Content-Type': 'application/json'
       },
@@ -339,10 +339,10 @@ import { Dialog, Form, TextField } from '@adobe/react-spectrum';
 
 export function EditReview({ review, ims, onClose }) {
   const handleSave = async (data) => {
-    await fetch('/api/v1/web/review-app/update-reviews', {
-      method: 'POST',
+    await fetch('/api/v1/web/review/update-reviews', {
+      method: 'PUT',
       headers: {
-        'Authorization': ims.token,
+        'Authorization': `Bearer ${ims.token}`,
         'x-gw-ims-org-id': ims.org,
         'Content-Type': 'application/json'
       },

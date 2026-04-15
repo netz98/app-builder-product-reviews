@@ -1,7 +1,7 @@
-h1. Product Reviews App Builder - Developer Setup & Environments
+h1. Product Reviews App Builder - Public Setup and Environments
 
 h2. Overview
-This guide helps new developers set up the Product Reviews Adobe App Builder project locally, select the correct Adobe I/O project and workspace, and understand environment differences (stage vs prod).
+This guide helps developers set up the Product Reviews Adobe App Builder project locally, choose the correct Adobe Developer Console workspace, and understand environment differences (stage vs prod) in a public-safe way.
 
 h2. Prerequisites (macOS)
 Install required tools with Homebrew:
@@ -12,10 +12,9 @@ brew install node
 brew install adobe/aio-cli/aio
 {code}
 
-
 Recommended versions:
 * Node.js: 18.x LTS
-* npm: 9+ (ships with Node)
+* npm: 9+
 * aio CLI: latest
 
 Verify installations:
@@ -27,14 +26,14 @@ aio -v
 
 h2. Access Requirements
 You need:
-* Access to the company Adobe Developer Console project
-* An Adobe ID associated with the org
-* Permission to the App Builder project and workspaces (stage and prod)
+* An Adobe Developer Console project with App Builder enabled
+* An Adobe ID associated with your organization
+* Access to at least one workspace (for example stage and/or prod)
 
 h2. Clone and Install Dependencies
 {code:bash}
 git clone <repo-url>
-cd product-reviews
+cd <project-folder>
 npm install
 {code}
 
@@ -70,7 +69,7 @@ aio config set project <project-name>
 aio config set workspace <workspace-name>
 {code}
 
-Tip: Workspaces map to environments (stage/prod). Confirm the active context with:
+Tip: workspaces usually map to environments (for example stage/prod). Confirm your active context with:
 {code:bash}
 aio config get
 {code}
@@ -81,7 +80,7 @@ Fetch project settings and create local config (if not already present):
 aio app use
 {code}
 
-This syncs the local project with the selected Adobe I/O project/workspace.
+This syncs the local project with the selected Adobe Developer Console project/workspace.
 
 h2. Local Development
 Run UI and actions locally:
@@ -104,54 +103,68 @@ npm run e2e
 h2. API Mesh (GraphQL) Commands and Usage
 The project includes a GraphQL Mesh config in `mesh.json` that maps REST endpoints to GraphQL operations.
 
-Common commands (use the currently selected org/project/workspace):
+`mesh.json` in git is a template and may contain a placeholder base URL like `{NAMESPACE}`.
+Before creating or updating Mesh, generate a deployable file with your real Runtime namespace.
 
-Run mesh locally for development:
+Recommended command (scripted):
 {code:bash}
-aio api-mesh run mesh.json
+npm run mesh:update
 {code}
 
-Create a mesh from the local config:
+The script resolves namespace from the current workspace, renders `mesh.generated.json`, and runs Mesh update.
+
+Optional namespace override:
 {code:bash}
-aio api-mesh create mesh.json
+NAMESPACE=<your-namespace> npm run mesh:update
 {code}
 
-Update an existing mesh after edits:
+Manual alternative (if needed):
 {code:bash}
-aio api-mesh update mesh.json
+NAMESPACE=$(aio config get runtime.namespace)
+sed "s|{NAMESPACE}|$NAMESPACE|g" mesh.json > mesh.generated.json
+aio api-mesh update mesh.generated.json
 {code}
 
-Inspect the deployed mesh:
+Then run Mesh commands with `mesh.generated.json`:
+{code:bash}
+aio api-mesh run mesh.generated.json
+aio api-mesh create mesh.generated.json
+aio api-mesh update mesh.generated.json
+{code}
+
+Inspect deployed mesh:
 {code:bash}
 aio api-mesh describe
 aio api-mesh status
 aio api-mesh get --active
 {code}
 
-View recent mesh logs (use RayId when provided):
+View recent mesh logs:
 {code:bash}
 aio api-mesh log-list
 aio api-mesh log-get --rayid <ray-id>
 {code}
 
-Purge mesh cache (all entries):
+Purge mesh cache:
 {code:bash}
 aio api-mesh cache purge --all
 {code}
 
 Notes:
-* The Mesh forwards auth headers to the REST API as defined in `mesh.json`.
-* When switching stage/prod workspaces, re-run `aio api-mesh describe` to confirm you are targeting the correct environment.
+* Mesh forwards auth headers to REST endpoints as defined in `mesh.json`.
+* Re-check workspace and namespace before Mesh deploy/update.
+* Do not commit `mesh.generated.json`; keep only template config in git.
+* You may temporarily set namespace directly in `mesh.json` and deploy that file, but do not commit namespace-specific values.
 
 h2. Environment Overview (Stage vs Prod)
 * Stage workspace is for testing, validation, and QA.
 * Prod workspace is for live production traffic and user data.
 
 Key differences:
-* Stage data is non-production and can be reset more freely.
-* Prod data is authoritative and must be protected.
+* Stage data is non-production and may be reset.
+* Prod data is authoritative and should be protected.
 * Stage is used for feature verification and integration testing.
-* Prod is only updated via approved deployments.
+* Prod updates should follow your release and approval process.
 
 h2. Deployment
 Deploy to the currently selected workspace:
@@ -159,7 +172,7 @@ Deploy to the currently selected workspace:
 aio app deploy
 {code}
 
-Verify the active workspace before deploying:
+Verify active workspace before deploying:
 {code:bash}
 aio config get
 {code}
@@ -167,8 +180,10 @@ aio config get
 h2. Troubleshooting
 * If you get permission errors, verify your org/project/workspace access in Adobe Developer Console.
 * If actions fail locally, re-run `aio app use` to refresh configuration.
-* For missing dependencies, remove `node_modules` and rerun `npm install`.
+* For missing dependencies, remove `node_modules` and run `npm install` again.
 
 h2. Helpful References
 * Project README: README.md
-* Auth notes: AUTHENTICATION.md
+* Setup guide: docs/SETUP.md
+* API reference: docs/API.md
+* Auth notes: docs/AUTHENTICATION.md

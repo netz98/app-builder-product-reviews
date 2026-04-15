@@ -2,7 +2,6 @@
 * <license header>
 */
 
-/* global fetch */
 import actions from './src/config.json'
 
 export const isCommerceAdminContext = () => {
@@ -15,8 +14,11 @@ export const isCommerceAdminContext = () => {
         referrer.includes('admin.commerce.adobe.com')
 }
 
-async function invokeAction (actionName, _headers, _params, props) {
-    const action = getAction(actionName, actions)
+async function invokeAction (actionName, _headers, _params) {
+    const action = actions[actionName]
+    if (!action) {
+        throw new Error(`Unknown action '${actionName}'`)
+    }
     const headers = _headers || {}
     const params = _params || {}
 
@@ -29,7 +31,7 @@ async function invokeAction (actionName, _headers, _params, props) {
         }
     })
 
-    const result = await actionWebInvoke(action[1], headers, params)
+    const result = await actionWebInvoke(action, headers, params)
     return result
 }
 

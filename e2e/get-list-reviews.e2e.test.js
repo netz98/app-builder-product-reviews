@@ -5,7 +5,7 @@ const { Config } = require('@adobe/aio-sdk').Core;
 const fetch = require('node-fetch');
 const namespace = Config.get('runtime.namespace');
 const hostname = Config.get('cna.hostname') || 'adobeioruntime.net';
-const runtimePackage = 'review-app';
+const runtimePackage = 'review';
 const actionUrl = `https://${namespace}.${hostname}/api/v1/web/${runtimePackage}/get-list-reviews`;
 const { getAuthHeaders } = require('./test-helper');
 
@@ -51,4 +51,3 @@ describe('get-list-reviews E2E', () => {
     expect(Array.isArray(body)).toBe(true);
   });
 });
-

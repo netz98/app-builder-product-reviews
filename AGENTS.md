@@ -21,7 +21,7 @@ Update: only provided fields; always refresh `updated_at`.
 | Folder | Path | Method | Notes |
 |--------|------|--------|-------|
 | create-review | /api/v1/create-review | POST | Returns created review (201). |
-| update-reviews | /api/v1/update-reviews | POST | Batch partial updates; per-item success array. |
+| update-reviews | /api/v1/update-reviews | PUT | Batch partial updates; per-item success array. |
 | delete-reviews-by-ids | /api/v1/delete-reviews-by-ids | POST | Batch delete; per-item success array. |
 | get-list-reviews | /api/v1/get-list-reviews | POST | Wildcard substring filters across searchable fields. |
 | get-reviews-by-ids | /api/v1/get-reviews-by-ids | POST | Returns array of reviews. |

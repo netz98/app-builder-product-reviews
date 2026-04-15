@@ -16,12 +16,12 @@
 
 **Production:**
 ```bash
-https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app
+https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review
 ```
 
 **Local Development:**
 ```bash
-http://localhost:9080/api/v1/web/review-app
+http://localhost:9080/api/v1/web/review
 ```
 
 Replace `{NAMESPACE}` with your Adobe I/O Runtime namespace.
@@ -40,7 +40,7 @@ Creates a new product review. All fields are required.
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/create-review" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/create-review" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -111,7 +111,7 @@ curl -X POST \
 ## 2. Update Reviews
 
 ### Endpoint
-`POST /update-reviews`
+`PUT /update-reviews`
 
 ### Description
 Batch update multiple reviews. Only provided fields are updated. Allows partial success/failure.
@@ -119,8 +119,8 @@ Batch update multiple reviews. Only provided fields are updated. Allows partial 
 ### Request
 
 ```bash
-curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/update-reviews" \
+curl -X PUT \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/update-reviews" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -228,7 +228,7 @@ Batch delete multiple reviews by their IDs. Allows partial success/failure.
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/delete-reviews-by-ids" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/delete-reviews-by-ids" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -244,7 +244,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/get-reviews-by-ids" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/get-reviews-by-ids" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -257,7 +257,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/delete-reviews-by-ids" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/delete-reviews-by-ids" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -310,7 +310,7 @@ Lists all reviews with optional filtering. Filters use case-insensitive substrin
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/get-list-reviews" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/get-list-reviews" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -321,7 +321,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/get-list-reviews" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/get-list-reviews" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -334,7 +334,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/get-list-reviews" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/get-list-reviews" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -350,7 +350,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/get-list-reviews" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/get-list-reviews" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -432,7 +432,7 @@ Fetches specific reviews by their IDs. Silently skips missing IDs.
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/get-reviews-by-ids" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/get-reviews-by-ids" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -495,7 +495,7 @@ Diagnostic endpoint for testing storage connectivity. Not for production use.
 
 ```bash
 curl -X POST \
-  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app/state-test" \
+  "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review/state-test" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {IMS_TOKEN}" \
   -H "x-gw-ims-org-id: {ORG_ID}" \
@@ -553,7 +553,7 @@ curl -X POST \
 
 | Code | Description |
 |------|-------------|
-| `200` | Success (GET, PUT, DELETE) |
+| `200` | Success (read, update, delete operations) |
 | `201` | Created (POST) |
 | `400` | Bad request (missing fields, invalid data) |
 | `401` | Unauthorized (missing or invalid authentication) |

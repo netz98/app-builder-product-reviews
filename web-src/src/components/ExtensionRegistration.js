@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { register } from '@adobe/uix-guest'
 import ReviewManager from "./ReviewManager";
 

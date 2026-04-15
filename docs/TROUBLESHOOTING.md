@@ -344,9 +344,13 @@ aio runtime:log <action-name>
 
 **Solutions:**
 
-1. **Verify `props.ims` is available:**
+1. **Verify auth context is available without logging secrets:**
    ```javascript
-   console.log(props.ims); // Should have token and org
+   console.log({
+     hasIms: Boolean(props.ims),
+     hasToken: Boolean(props.ims?.token),
+     hasOrg: Boolean(props.ims?.org)
+   });
    ```
 
 2. **Check user is logged in:**

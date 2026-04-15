@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   DialogTrigger,
   Dialog,
@@ -27,7 +26,6 @@ export default function ReviewFormModal({
   mode,
   form,
   setForm,
-  touched,
   setTouched,
   getValidationState,
   getErrorMessage,
@@ -61,7 +59,7 @@ export default function ReviewFormModal({
       }}
       type="modal"
     >
-      <React.Fragment />
+      <></>
       <Dialog style={{ maxWidth: 520 }}>
         <Heading>{heading}</Heading>
         <Content>

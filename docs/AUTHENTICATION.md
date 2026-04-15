@@ -74,7 +74,7 @@ Content-Type: application/json
 - Enforces multi-tenancy
 
 **Content-Type:**
-- Required for POST/PUT requests
+- Required for POST and PUT requests
 - Must be `application/json`
 
 ---
@@ -141,10 +141,10 @@ props.ims = {
 const { ims } = props;
 
 // API call with auth headers
-fetch('/api/v1/web/review-app/get-list-reviews', {
+fetch('/api/v1/web/review/get-list-reviews', {
   method: 'POST',
   headers: {
-    'Authorization': ims.token,
+    'Authorization': `Bearer ${ims.token}`,
     'x-gw-ims-org-id': ims.org,
     'Content-Type': 'application/json'
   },
@@ -220,7 +220,7 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  'https://NAMESPACE.adobeioruntime.net/api/v1/web/review-app/create-review' \
+  'https://NAMESPACE.adobeioruntime.net/api/v1/web/review/create-review' \
   -H 'Authorization: Bearer {IMS_ACCESS_TOKEN}' \
   -H 'x-gw-ims-org-id: {ORG_ID}' \
   -H 'Content-Type: application/json' \
@@ -297,7 +297,7 @@ class ReviewsApiClient {
 
 // Usage
 $api = new ReviewsApiClient(
-    'https://NAMESPACE.adobeioruntime.net/api/v1/web/review-app',
+    'https://NAMESPACE.adobeioruntime.net/api/v1/web/review',
     $imsToken,  // Get from your session or OAuth flow
     $orgId      // Get from your configuration
 );

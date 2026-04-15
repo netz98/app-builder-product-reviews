@@ -433,6 +433,26 @@ query StateTest {
 
 The GraphQL Mesh is configured in `mesh.json`:
 
+> `mesh.json` may be kept as a template in git (with `{NAMESPACE}` placeholder).
+> Before `aio api-mesh create/update`, render a deployable file with your actual runtime namespace.
+
+```bash
+npm run mesh:update
+```
+
+The script renders `mesh.generated.json` and updates Mesh for the active workspace.
+
+Manual alternative:
+
+```bash
+NAMESPACE=$(aio config get runtime.namespace)
+sed "s|{NAMESPACE}|$NAMESPACE|g" mesh.json > mesh.generated.json
+aio api-mesh update mesh.generated.json
+```
+
+Use `mesh.generated.json` for Mesh create/update commands.
+You may also set namespace directly in `mesh.json` and deploy that file, but do not commit namespace-specific values.
+
 ```json
 {
   "meshConfig": {
@@ -441,7 +461,7 @@ The GraphQL Mesh is configured in `mesh.json`:
         "name": "ReviewsService",
         "handler": {
           "JsonSchema": {
-            "baseUrl": "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review-app",
+            "baseUrl": "https://{NAMESPACE}.adobeioruntime.net/api/v1/web/review",
             "operationHeaders": {
               "Authorization": "{context.headers['authorization']}",
               "x-gw-ims-org-id": "{context.headers['x-gw-ims-org-id']}",
