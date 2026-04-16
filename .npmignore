@@ -1,0 +1,32 @@
+# Keep App Builder package lean and distributable.
+# `aio app pack` relies on npm pack file-selection rules.
+
+# Internal / non-distributable artifacts
+Confluence.md
+AGENTS.md
+AUTHENTICATION.md
+opencode.jsonc
+
+# Local assistant/editor/workspace artifacts
+.ai/
+.opencode/
+.idea/
+.vscode/
+
+# OS / temp artifacts
+.DS_Store
+*.log
+
+# Build and coverage artifacts
+dist/
+coverage/
+.parcel-cache/
+
+# Tests and test helpers (not required at runtime)
+test/
+e2e/
+jest.setup.js
+
+# Local/generated mesh file (template stays in repo)
+mesh.generated.json
+
